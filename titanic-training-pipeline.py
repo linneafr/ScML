@@ -1,11 +1,11 @@
 import os
 import modal
 
-LOCAL=True
+LOCAL = False
 
 if LOCAL == False:
    stub = modal.Stub()
-   image = modal.Image.debian_slim().apt_install(["libgomp1"]).pip_install(["hopsworks", "seaborn", "joblib", "scikit-learn"])
+   image = modal.Image.debian_slim().apt_install(["libgomp1"]).pip_install(["hopsworks", "seaborn", "joblib", "scikit-learn", "xgboost"])
 
    @stub.function(image=image, schedule=modal.Period(days=1), secret=modal.Secret.from_name("HOPSWORKS_API_KEY"))
    def f():
@@ -24,14 +24,10 @@ def g():
     from hsml.schema import Schema
     from hsml.model_schema import ModelSchema
     import joblib
+    import xgboost as xgb
 
-    # You have to set the environment variable 'HOPSWORKS_API_KEY' for login to succeed
     project = hopsworks.login()
-    # fs is a reference to the Hopsworks Feature Store
     fs = project.get_feature_store()
-
-    # The feature view is the input set of features for your model. The features can come from different feature groups.
-    # You can select features from different feature groups and join them together to create a feature view
     try:
         feature_view = fs.get_feature_view(name="titanic_modal", version=1)
     except:
@@ -39,15 +35,19 @@ def g():
         query = titanic_fg.select_all()
         feature_view = fs.create_feature_view(name="titanic_modal",
                                           version=1,
-                                          description="Read from Titanic dataset",
+                                          description="Read from Titanic passenger dataset",
                                           labels=["survived"],
                                           query=query)
 
-    # You can read training data, randomly split into train/test sets of features (X) and labels (y)
+    # Read and split train/test data
     X_train, X_test, y_train, y_test = feature_view.train_test_split(0.2)
 
     # Train our model with the Scikit-learn K-nearest-neighbors algorithm using our features (X_train) and labels (y_train)
-    model = KNeighborsClassifier(n_neighbors=2)
+    # model = KNeighborsClassifier(n_neighbors=2)
+    # model.fit(X_train, y_train.values.ravel())
+    
+    # Train our model with xgboost classifier
+    model = xgb.XGBClassifier()
     model.fit(X_train, y_train.values.ravel())
 
     # Evaluate model performance using the features from the test set (X_test)
@@ -66,7 +66,7 @@ def g():
     # We will now upload our model to the Hopsworks Model Registry. First get an object for the model registry.
     mr = project.get_model_registry()
 
-    # The contents of the 'iris_model' directory will be saved to the model registry. Create the dir, first.
+    # The contents of the 'titanic_model' directory will be saved to the model registry. Create the dir, first.
     model_dir="titanic_model"
     if os.path.isdir(model_dir) == False:
         os.mkdir(model_dir)
@@ -82,7 +82,7 @@ def g():
     model_schema = ModelSchema(input_schema, output_schema)
 
     # Create an entry in the model registry that includes the model's name, desc, metrics
-    iris_model = mr.python.create_model(
+    titanic_model = mr.python.create_model(
         name="titanic_modal",
         metrics={"accuracy" : metrics['accuracy']},
         model_schema=model_schema,
@@ -90,7 +90,7 @@ def g():
     )
 
     # Upload the model to the model registry, including all files in 'model_dir'
-    iris_model.save(model_dir)
+    titanic_model.save(model_dir)
 
 if __name__ == "__main__":
     if LOCAL == True :

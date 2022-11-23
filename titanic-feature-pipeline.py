@@ -1,25 +1,62 @@
 import os
 import modal
-#import great_expectations as ge
-import hopsworks
-import pandas as pd
+    
+LOCAL = False
 
-project = hopsworks.login()
-fs = project.get_feature_store()
+if LOCAL == False:
+   stub = modal.Stub()
+   image = modal.Image.debian_slim().pip_install(["hopsworks","joblib","seaborn","sklearn","dataframe-image"]) 
 
-titanic_df = pd.read_csv('titanic.csv')
+   @stub.function(image=image, schedule=modal.Period(days=1), secret=modal.Secret.from_name("HOPSWORKS_API_KEY"))
+   def f():
+       g()
 
-titanic_fg = fs.get_or_create_feature_group(
-    name="titanic_modal",
-    version=1,
-    primary_key=["Pclass","Sex","Age","Sibsp", "Parch", "Pricerange"],
-    description="Titanic dataset")
-titanic_fg.insert(titanic_df, write_options={"wait_for_job" : False})
 
-#expectation_suite = ge.core.ExpectationSuite(expectation_suite_name="iris_dimensions")
-#value_between(expectation_suite, "sepal_length", 4.5, 8.0)
-#value_between(expectation_suite, "sepal_width", 2.1, 4.5)
-#value_between(expectation_suite, "petal_length", 1.2, 7)
-#value_between(expectation_suite, "petal_width", 0.2, 2.5)
-#iris_fg.save_expectation_suite(expectation_suite=expectation_suite, validation_ingestion_policy="STRICT")
+def g():
+    import hopsworks
+    import pandas as pd
 
+    source_url = "https://raw.githubusercontent.com/ID2223KTH/id2223kth.github.io/master/assignments/lab1/titanic.csv"
+    project = hopsworks.login()
+    fs = project.get_feature_store()
+    df = pd.read_csv(source_url)
+    
+    # filling null values using fillna
+    # and dropping unwanted columns
+    df.reset_index(drop=True)
+    df['Age'].fillna(value=round(df.Age.mean()), inplace=True)
+    df['Sex'].replace('male', 0, inplace=True)
+    df['Sex'].replace('female', 1, inplace=True)
+    df.drop('Ticket', axis=1, inplace=True)
+    df.drop('Name', axis=1, inplace=True)
+    df.drop('Embarked', axis=1, inplace=True)
+    df.drop('Cabin', axis=1, inplace=True)
+
+    # Aggregating price data into bins:
+    bins = [-1, 10, 30, 50, 100, np.inf]
+    labels = [1, 2, 3, 4, 5]
+    df['Pricerange'] = pd.cut(df['Fare'], bins, labels=labels)
+    df.drop('Fare', axis=1, inplace=True)
+    df.drop('PassengerId', axis=1, inplace=True)
+
+    # Reordering columns + ensuring lowercase
+    temp_cols=df.columns.tolist()
+    new_cols=temp_cols[1:] + temp_cols[0:1]
+    df = df[new_cols]
+    df.columns = df.columns.str.lower()
+    print(df.head)
+    
+    # Inserting df to feature store
+    titanic_fg = fs.get_or_create_feature_group(
+        name="titanic_modal",
+        version=1,
+        primary_key=["pclass","sex","age","sibsp", "parch", "pricerange"],
+        description="titanic dataset")
+    titanic_fg.insert(df, write_options={"wait_for_job" : False})
+
+if __name__ == "__main__":
+    if LOCAL == True :
+        g()
+    else:
+        with stub.run():
+            f()
