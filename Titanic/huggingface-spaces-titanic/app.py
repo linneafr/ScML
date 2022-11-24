@@ -1,8 +1,5 @@
 import gradio as gr
 import numpy as np
-from PIL import Image
-import requests
-
 import hopsworks
 import joblib
 
@@ -11,7 +8,7 @@ fs = project.get_feature_store()
 
 
 mr = project.get_model_registry()
-model = mr.get_model("titanic_modal", version=1)
+model = mr.get_model("titanic_modal_v2", version=1)
 model_dir = model.download()
 model = joblib.load(model_dir + "/titanic_model.pkl")
 
@@ -26,10 +23,6 @@ def titanic(pclass, sex, age, sibsp, parch, pricerange):
     input_list.append(pricerange)
     # 'res' is a list of predictions returned as the label.
     res = model.predict(np.asarray(input_list).reshape(1, -1))
-    # We add '[0]' to the result of the transformed 'res', because 'res' is a list, and we only want
-    # the first element.
-    #flower_url = "https://raw.githubusercontent.com/featurestoreorg/serverless-ml-course/main/src/01-module/assets/" + res[0] + ".png"
-    #img = Image.open(requests.get(flower_url, stream=True).raw)
     if res[0]==0:
         output = "Did not survive"
     else:
@@ -50,7 +43,6 @@ demo = gr.Interface(
         gr.inputs.Number(default=1.0, label="# of children/parents aboard"),
         gr.inputs.Number(default=1.0, label="pricerange (1=cheapest, 5=most expensive)"),
         ],
-    #outputs=gr.Image(type="pil"))
     outputs="text")
 
 
