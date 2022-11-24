@@ -5,7 +5,7 @@ LOCAL = False
 
 if LOCAL == False:
    stub = modal.Stub()
-   image = modal.Image.debian_slim().pip_install(["hopsworks","joblib","seaborn","sklearn","dataframe-image"]) 
+   image = modal.Image.debian_slim().apt_install(["libgomp1"]).pip_install(["hopsworks", "seaborn", "joblib","dataframe-image", "sklearn"])
 
    @stub.function(image=image, schedule=modal.Period(days=1), secret=modal.Secret.from_name("HOPSWORKS_API_KEY"))
    def f():
@@ -33,16 +33,15 @@ def generate_passenger(train_set):
 
 def g():
     import hopsworks
-    import pandas as pd
 
     project = hopsworks.login()
     fs = project.get_feature_store()
-    feature_view = fs.get_feature_view(name="titanic_modal",
+    feature_view = fs.get_feature_view(name="titanic_modal_v2",
                                         version=1)  
     train_set, _, _, _ = feature_view.train_test_split(0.2)
     df = generate_passenger(train_set)
 
-    fg = fs.get_feature_group(name="titanic_modal",version=1)
+    fg = fs.get_feature_group(name="titanic_modal_v2",version=1)
     fg.insert(df, write_options={"wait_for_job" : False})
 
 if __name__ == "__main__":

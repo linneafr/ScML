@@ -15,6 +15,7 @@ if LOCAL == False:
 def g():
     import hopsworks
     import pandas as pd
+    import numpy as np
 
     source_url = "https://raw.githubusercontent.com/ID2223KTH/id2223kth.github.io/master/assignments/lab1/titanic.csv"
     project = hopsworks.login()
@@ -27,6 +28,10 @@ def g():
     df['Age'].fillna(value=round(df.Age.mean()), inplace=True)
     df['Sex'].replace('male', 0, inplace=True)
     df['Sex'].replace('female', 1, inplace=True)
+    df['Sex'] = df['Sex'].astype('str').astype('category')
+    df['SibSp'] = df['SibSp'].astype('str').astype('category')
+    df['Pclass'] = df['Pclass'].astype('str').astype('category')
+    df['Parch'] = df['Parch'].astype('str').astype('category')
     df.drop('Ticket', axis=1, inplace=True)
     df.drop('Name', axis=1, inplace=True)
     df.drop('Embarked', axis=1, inplace=True)
@@ -35,7 +40,7 @@ def g():
     # Aggregating price data into bins:
     bins = [-1, 10, 30, 50, 100, np.inf]
     labels = [1, 2, 3, 4, 5]
-    df['Pricerange'] = pd.cut(df['Fare'], bins, labels=labels)
+    df['Pricerange'] = pd.cut(df['Fare'], bins, labels=labels).astype('str').astype('category')
     df.drop('Fare', axis=1, inplace=True)
     df.drop('PassengerId', axis=1, inplace=True)
 
@@ -44,11 +49,11 @@ def g():
     new_cols=temp_cols[1:] + temp_cols[0:1]
     df = df[new_cols]
     df.columns = df.columns.str.lower()
-    print(df.head)
+    print(df.head())
     
     # Inserting df to feature store
     titanic_fg = fs.get_or_create_feature_group(
-        name="titanic_modal",
+        name="titanic_modal_v2",
         version=1,
         primary_key=["pclass","sex","age","sibsp", "parch", "pricerange"],
         description="titanic dataset")

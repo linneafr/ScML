@@ -29,11 +29,11 @@ def g():
     project = hopsworks.login()
     fs = project.get_feature_store()
     try:
-        feature_view = fs.get_feature_view(name="titanic_modal", version=1)
+        feature_view = fs.get_feature_view(name="titanic_modal_v2", version=1)
     except:
-        titanic_fg = fs.get_feature_group(name="titanic_modal", version=1)
+        titanic_fg = fs.get_feature_group(name="titanic_modal_v2", version=1)
         query = titanic_fg.select_all()
-        feature_view = fs.create_feature_view(name="titanic_modal",
+        feature_view = fs.create_feature_view(name="titanic_modal_v2",
                                           version=1,
                                           description="Read from Titanic passenger dataset",
                                           labels=["survived"],
@@ -41,6 +41,21 @@ def g():
 
     # Read and split train/test data
     X_train, X_test, y_train, y_test = feature_view.train_test_split(0.2)
+
+    # Change data type for compatability with xgboost
+    X_train['pclass'] = X_train['pclass'].astype(int)
+    X_train['sex'] = X_train['sex'].astype(int)
+    X_train['sibsp'] = X_train['sibsp'].astype(int)
+    X_train['parch'] = X_train['parch'].astype(int)
+    X_train['pricerange'] = X_train['pricerange'].astype(int)
+    y_train['survived'] = y_train['survived'].astype(int)
+    
+    X_test['pclass'] = X_test['pclass'].astype(int)
+    X_test['sex'] = X_test['sex'].astype(int)
+    X_test['sibsp'] = X_test['sibsp'].astype(int)
+    X_test['parch'] = X_test['parch'].astype(int)
+    X_test['pricerange'] = X_test['pricerange'].astype(int)
+    y_test['survived'] = y_test['survived'].astype(int)
 
     # Train our model with the Scikit-learn K-nearest-neighbors algorithm using our features (X_train) and labels (y_train)
     # model = KNeighborsClassifier(n_neighbors=2)
@@ -83,7 +98,7 @@ def g():
 
     # Create an entry in the model registry that includes the model's name, desc, metrics
     titanic_model = mr.python.create_model(
-        name="titanic_modal",
+        name="titanic_modal_v2",
         metrics={"accuracy" : metrics['accuracy']},
         model_schema=model_schema,
         description="Titanic Dataset Predictor"
