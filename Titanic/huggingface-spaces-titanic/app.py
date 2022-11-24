@@ -8,7 +8,7 @@ fs = project.get_feature_store()
 
 
 mr = project.get_model_registry()
-model = mr.get_model("titanic_modal", version=1)
+model = mr.get_model("titanic_modal_v2", version=1)
 model_dir = model.download()
 model = joblib.load(model_dir + "/titanic_model.pkl")
 
