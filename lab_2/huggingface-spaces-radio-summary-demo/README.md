@@ -1,5 +1,5 @@
 ---
-title: Whisper Se Demo
+title: swedish-news-summarizer
 emoji: 🐢
 colorFrom: yellow
 colorTo: red
