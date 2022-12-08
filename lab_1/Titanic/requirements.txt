@@ -1,0 +1,7 @@
+joblib
+scikit-learn
+seaborn
+xgboost
+dataframe-image
+modal-client
+gradio
