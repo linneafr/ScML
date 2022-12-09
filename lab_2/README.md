@@ -19,7 +19,7 @@ Source code found in "hugginface-spaces-base-demo".
 ## Application 2 - INSERT LINK HERE
 Insert a Youtube link as input and receive a transcription from the Whisper model. Built using pytube library.
 
-Source code found in "huggingface-demo-youtube".
+Source code found in "huggingface-spaces-youtube".
 
 ## Application 3 - [Multilingual Swedish news summarizer](https://huggingface.co/spaces/TeoJM/swedish-news-summarizer)
 - Idea
