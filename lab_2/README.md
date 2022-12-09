@@ -11,6 +11,10 @@ Accessing this data is then straightforward by simply authenticating ones Google
 
 The fine-tuned model and relevant parameters/metrics of the training [can be found here](https://huggingface.co/TeoJM/whisper-small-se), the word-error-rate on the Swedish dataset was improved significantly from 23.94 at beginning of training to 19.85 at the end of training.
 
+For improving the model further a library for parameter tuning could be used, such as optuna, sigopt or raytune. They will perform a parameter search and save the best performance. Since we have limited data to train on we could also try if cross validation improves the result.
+
+Regarding the data, a larger quantity of data would without doubt give a better result. If we wanted more labelled data we could turn to for example audio books. We should also aim towards reducing bias in the training set, for example make sure to include different accents or speech defects, female and men voices of all ages. 
+
 ## Application 1 - [Simple demo](https://huggingface.co/spaces/TeoJM/whisper-se-demo)
 Use your microphone directly as input and receive a transcription from the Whisper model.
 
