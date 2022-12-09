@@ -24,7 +24,7 @@ Source code found in "huggingface-demo-youtube".
 ## Application 3 - [Multilingual Swedish news summarizer](https://huggingface.co/spaces/TeoJM/swedish-news-summarizer)
 - Idea
   - Not everyone in a country can understand the language well enough to properly understand the content of a news programme, but every citizen should have access to important news.
-  - Using our ASR model capable of transcribing a Swedish sound file, with a simple prompt, we can use a large language model to provide a summary in a given language.
+  - Using our ASR model capable of transcribing a Swedish sound file, with a simple prompt, we can use a large language model to provide a summary in a given language. To this end we used the openai library to send request to [GPT-models](https://beta.openai.com/overview)
 - Usage 
   - Insert a url linking directly to a .mp3 file on the web, recommended example would be from [Sveriges Radio](https://sverigesradio.se/p3nyheterpaenminut).
   - Choose the language you would like to receive the summary in (NOTE: Languages other than English only available using "text-davinci-003").
