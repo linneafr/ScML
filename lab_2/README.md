@@ -21,7 +21,7 @@ Insert a Youtube link as input and receive a transcription from the Whisper mode
 
 Source code found in "huggingface-demo-youtube".
 
-## Application 3 - [Multilingul Swedish news summarizer](https://huggingface.co/spaces/TeoJM/swedish-news-summarizer)
+## Application 3 - [Multilingual Swedish news summarizer](https://huggingface.co/spaces/TeoJM/swedish-news-summarizer)
 - Idea
   - Not everyone in a country can understand the language well enough to properly understand the content of a news programme, but every citizen should have access to important news.
   - Using our ASR model capable of transcribing a Swedish sound file, with a simple prompt, we can use a large language model to provide a summary in a given language.
