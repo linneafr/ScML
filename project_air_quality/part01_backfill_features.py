@@ -6,6 +6,7 @@ import hopsworks
 
 df_air_quality = pd.read_csv('air_qality_data.csv')
 df_weather = pd.read_csv('weather_data.csv')
+df_more_weather = pd.read_csv('more_weather_data.csv')
 
 def timestamp_2_time(x):
     dt_obj = datetime.strptime(str(x), '%Y-%m-%d')
@@ -14,6 +15,7 @@ def timestamp_2_time(x):
 
 df_air_quality.date = df_air_quality.date.apply(timestamp_2_time)
 df_weather.datetime = df_weather.datetime.apply(timestamp_2_time)
+df_more_weather.datetime = df_more_weather.datetime.apply(timestamp_2_time)
 
 project = hopsworks.login()
 fs = project.get_feature_store()
@@ -41,3 +43,4 @@ weather_fg = fs.get_or_create_feature_group(
     )
 
 weather_fg.insert(df_weather)
+weather_fg.insert(df_more_weather)
