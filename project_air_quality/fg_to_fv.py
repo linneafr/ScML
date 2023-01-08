@@ -39,7 +39,8 @@ def main():
     air_weather_data_joint_fg.insert(joint_df)
 
     # Create joint feature view
-    mapping_transformers = {col_name:fs.get_transformation_function(name='standard_scaler') for col_name in joint_df.columns if col_name != 'date'}
+    identity_columns = ['date', 'aqi'] # Index and output is not transformed
+    mapping_transformers = {col_name:fs.get_transformation_function(name='standard_scaler') for col_name in joint_df.columns if col_name not in identity_columns}
     query = air_weather_data_joint_fg.select_all()
 
     feature_view = fs.create_feature_view(
