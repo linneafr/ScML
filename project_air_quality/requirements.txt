@@ -1,0 +1,9 @@
+hopsworks
+joblib
+scikit-learn
+seaborn
+xgboost
+tensorflow
+matplotlib
+numpy
+pandas
