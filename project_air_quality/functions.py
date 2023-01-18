@@ -7,6 +7,7 @@ import pandas as pd
 from dotenv import load_dotenv
 load_dotenv()
 
+from decouple import config
 
 def decode_features(df, feature_view):
     """Decodes features in the input DataFrame using corresponding Hopsworks Feature Store transformation functions"""
@@ -67,53 +68,33 @@ def get_air_json(city_name, AIR_QUALITY_API_KEY):
 
 
 def get_air_quality_data(city_name):
-    AIR_QUALITY_API_KEY = os.getenv('AIR_QUALITY_API_KEY')
-    json = get_air_json(city_name, AIR_QUALITY_API_KEY)
+    aq_key = config('aq_api',default='')
+    AIR_QUALITY_API_KEY = os.getenv('aq_key')
+    json = get_air_json(city_name, 'AIR_QUALITY_API_KEY')
     iaqi = json['iaqi']
     forecast = json['forecast']['daily']
+    #print(iaqi)
+    #print(forecast)
     return [
-        city_name,
-        json['aqi'],                 # AQI
+        #city_name,
+        #json['aqi'],                 # AQI
         json['time']['s'][:10],      # Date
-        iaqi['h']['v'],
-        iaqi['p']['v'],
-        iaqi['pm10']['v'],
-        iaqi['t']['v'],
-        forecast['o3'][0]['avg'],
-        forecast['o3'][0]['max'],
-        forecast['o3'][0]['min'],
-        forecast['pm10'][0]['avg'],
-        forecast['pm10'][0]['max'],
-        forecast['pm10'][0]['min'],
-        forecast['pm25'][0]['avg'],
-        forecast['pm25'][0]['max'],
-        forecast['pm25'][0]['min'],
-        forecast['uvi'][0]['avg'],
-        forecast['uvi'][0]['avg'],
-        forecast['uvi'][0]['avg']
+        str(iaqi['pm25']['v']),
+        str(iaqi['pm10']['v']),
+        str(iaqi['no2']['v']),
+        str(iaqi['so2']['v']),
+        str(iaqi['co']['v'])
+
     ]
 
 def get_air_quality_df(data):
     col_names = [
-        'city',
-        'aqi',
         'date',
-        'iaqi_h',
-        'iaqi_p',
-        'iaqi_pm10',
-        'iaqi_t',
-        'o3_avg',
-        'o3_max',
-        'o3_min',
-        'pm10_avg',
-        'pm10_max',
-        'pm10_min',
-        'pm25_avg',
-        'pm25_max',
-        'pm25_min',
-        'uvi_avg',
-        'uvi_max',
-        'uvi_min',
+        'pm25',
+        'pm10',
+        'no2',
+        'so2',
+        'co',
     ]
 
     new_data = pd.DataFrame(
@@ -121,6 +102,12 @@ def get_air_quality_df(data):
         columns=col_names
     )
     new_data.date = new_data.date.apply(timestamp_2_time)
+
+    def get_max(x):
+        return x.max()
+
+    new_data['AQI'] = float(new_data[['pm25', 'pm10', 'no2', 'so2', 'co']].apply(get_max, axis=1))
+    #print(new_data)
 
     return new_data
 
@@ -130,7 +117,9 @@ def get_weather_json(city, date, WEATHER_API_KEY):
 
 
 def get_weather_data(city_name, date):
-    WEATHER_API_KEY = os.getenv('WEATHER_API_KEY')
+
+    weather_key = config('weather_api',default='')
+    WEATHER_API_KEY = os.getenv('weather_key')
     json = get_weather_json(city_name, date, WEATHER_API_KEY)
     data = json['days'][0]
 
