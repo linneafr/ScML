@@ -1,0 +1,7 @@
+hopsworks
+pandas
+datetime
+requests
+joblib
+numpy
+scikit-learn==1.0.2
