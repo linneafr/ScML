@@ -18,6 +18,6 @@ A backfill feature pipeline was created and a daily job scheduled for updating t
 
 ## The model
 
-In model_selection_training.ipynb the feature groups for the weather and AQI data were joined together to be able to perform model training. 
+In model_selection_training.ipynb the feature groups for the weather and AQI data were joined together to create a joint feature group to be able to perform model training. Four different models were trained for 1-day prediction using xgboost, gradient boosting, random forest and decision tree. 
 
 In order to make the predictions, weather forecasting data for the next 7 days were downloaded directly from VisualCrossing into a data frame and fed into the model. Based on the weather forecasting, a prediction of the corresponding total AQI is made for the following week. 
