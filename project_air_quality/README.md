@@ -13,6 +13,8 @@ The data was parsed to the apropriate date-time format and AQI was calculated an
 The weather data which was downloaded from VisualCrossing was cleaned, and unnecesary data for the task at hand was removed.
 
 The AQI data and weather data was joined together to create a feature group at hopsworks https://c.app.hopsworks.ai/p/5380/fs/5287/fg/14750 
-A backfill feature pipeline was created and a weekly job scheduled for updating the model. 
+A backfill feature pipeline was created and a daily job scheduled for updating the feature store with the most recent data. 
 
 ## The model
+
+In order to make the predictions, weather forecasting data for the next 7 days were downloaded directly from VisualCrossing into a data frame and fed into the model.
