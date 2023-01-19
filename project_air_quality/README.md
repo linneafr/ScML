@@ -7,6 +7,9 @@ The UI can be accessed through the following Hugging Face space.
 
 https://huggingface.co/spaces/TeoJM/id2223_project_air_quality_weekly_forecast_Reykjavik
 
+<img width="1246" alt="Skärmavbild 2023-01-19 kl  13 01 27" src="https://user-images.githubusercontent.com/26428378/213437905-89d78d7e-5f12-4e41-949a-bdce06404b80.png">
+
+
 ## The data
 The historical air quality data was downloaded from [World Air Quality Index](https://aqicn.org/city/iceland/grensasv) from the site Grensásv in Reykjavik.
 The data was parsed to the apropriate date-time format and the total AQI was calculated and added to the dataframe. 
